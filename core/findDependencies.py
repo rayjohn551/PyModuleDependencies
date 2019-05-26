@@ -65,15 +65,14 @@ def resolve_path_locality(module_name, current_dir, root_dir, current_only=False
     return None, False
 
 
-def main():
-    source_path = 'C:\\Users\\RPOP\\PycharmProjects\\PyModuleDependencies\\testPackage'
+def get_dependencies_map(source_path):
     all_files = []
     all_dirs = [source_path]
     for root, dirs, files in os.walk(source_path):
         for d in dirs:
             all_dirs.append(str(os.path.join(root, d)))
         for f in files:
-            if f.endswith('.py') and '__' not in f:# and 'absoluteImportObjFromOtherModule' in f:
+            if f.endswith('.py') and '__' not in f:
                 all_files.append(str(os.path.join(root, f)))
     module_map = {}  # name : moduleObj
 
@@ -106,15 +105,4 @@ def main():
                 module_map[name].children.update({module_map[mod_name]})
                 module_map[mod_name].parents.update({module_map[name]})
 
-    print '-'*100
-    for name, module in module_map.iteritems():
-        print module.name
-        print module.path
-        print [m.name for m in module.parents] # used by
-        print [m.name for m in module.children] # uses
-
-    print 'finished!'
-
-
-if __name__ == '__main__':
-    main()
+    return module_map
