@@ -81,8 +81,6 @@ def get_dependencies_map(source_path):
 
     for script in all_files:
         name = get_file_name(script)
-        if name == 'entity':
-            print '1'
         v = ModVisitor()
         code = ast.parse(open(script,'r').read())
         v.visit(code)

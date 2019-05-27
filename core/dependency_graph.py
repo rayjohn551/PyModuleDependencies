@@ -101,26 +101,19 @@ class DirectoryViz(QtWidgets.QMainWindow):
         self.scene.addItem(path_item)
 
     def wheelEvent(self, event):
-        """
-        Zoom in or out of the view.
-        """
         zoomInFactor = 1.25
         zoomOutFactor = 1 / zoomInFactor
 
-        # Save the scene pos
         oldPos = self.view.mapToScene(event.pos())
 
-        # Zoom
         if event.angleDelta().y() > 0:
             zoomFactor = zoomInFactor
         else:
             zoomFactor = zoomOutFactor
         self.view.scale(zoomFactor, zoomFactor)
 
-        # Get the new position
         newPos = self.view.mapToScene(event.pos())
 
-        # Move scene to old position
         delta = newPos - oldPos
         self.view.translate(delta.x(), delta.y())
 
