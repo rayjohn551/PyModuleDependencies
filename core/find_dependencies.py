@@ -12,12 +12,15 @@ class ModVisitor(ast.NodeVisitor):
         super(ModVisitor, self).generic_visit(node)
 
     def visit_Import(self, node):
-        self.modules.extend([(n.name,[]) for n in node.names])
+        self.modules.extend([(n.name,[]) for n in node.names if n.name])
 
     def visit_ImportFrom(self, node):
         source_module = node.module
-        modules_or_objects = [n.name for n in node.names]
-        self.modules.append((source_module,modules_or_objects))
+        modules_or_objects = [n.name for n in node.names if n.name]
+        if not source_module:  # could be local relative import ex: from . import foo
+            self.modules.extend([(m, []) for m in modules_or_objects])
+        else:
+            self.modules.append((source_module,modules_or_objects))
 
 
 class ModuleDep(object):
@@ -77,10 +80,12 @@ def get_dependencies_map(source_path):
     module_map = {}  # name : moduleObj
 
     for script in all_files:
+        name = get_file_name(script)
+        if name == 'entity':
+            print '1'
         v = ModVisitor()
         code = ast.parse(open(script,'r').read())
         v.visit(code)
-        name = get_file_name(script)
         if name not in module_map.keys():
             module_map[name] = ModuleDep(name=name,path=script)
         for mod, subs in v.modules:
